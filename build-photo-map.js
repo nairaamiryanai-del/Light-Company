@@ -1,4 +1,4 @@
-import { readdirSync } from 'fs';
+import { readdirSync, writeFileSync } from 'fs';
 
 const photosDir = 'C:/Users/Naira/light company/public/photos_optimized';
 const files = readdirSync(photosDir);
@@ -33,8 +33,8 @@ for (const file of files) {
     let articleKey = baseName;
     let isVariant = false;
 
-    // Check if ends with -N (where N is 1-9)
-    const variantMatch = baseName.match(/^(.+)-(\d)$/);
+    // Check if ends with -N (where N is 1 or more digits)
+    const variantMatch = baseName.match(/^(.+)-(\d+)$/);
     if (variantMatch) {
         // Could be a variant photo OR a separate article
         // We'll store under both and resolve later
@@ -83,9 +83,7 @@ js += '    const key = article.toLowerCase();\n';
 js += '    return PHOTO_MAP[key] || [];\n';
 js += '}\n';
 
-import { writeFileSync } from 'fs';
 writeFileSync('C:/Users/Naira/light company/src/photo-map.js', js, 'utf-8');
-
 console.log('Total unique articles with photos:', sortedKeys.length);
 console.log('Total photo files mapped:', files.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f)).length);
 console.log('Sample entries:');

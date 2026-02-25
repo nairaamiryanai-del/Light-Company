@@ -1,6 +1,10 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const csv = readFileSync('C:/Users/Naira/Desktop/Прайс общий от 02.02.2026.csv', 'utf-8');
+import path from 'path';
+
+const defaultPath = path.join(process.cwd(), 'data', 'Прайс общий от 02.02.2026.csv');
+const csvPath = process.argv[2] || defaultPath;
+const csv = readFileSync(csvPath, 'utf-8');
 const lines = csv.split('\n');
 
 function categorize(name) {
@@ -52,7 +56,9 @@ function categorize(name) {
 
 function parsePrice(str) {
     if (!str) return 0;
-    return parseInt(str.replace(/[^\d]/g, ''), 10) || 0;
+    // Удаляем все кроме цифр, точек и запятых
+    const cleanStr = str.replace(/[^\d.,]/g, '').replace(',', '.');
+    return parseFloat(cleanStr) || 0;
 }
 
 const products = [];
@@ -107,7 +113,7 @@ console.log('Total products:', products.length);
 console.log('By subcategory:', counts);
 
 // Generate JS code
-let js = 'const PRODUCTS = [\n';
+let js = 'export const PRODUCTS = [\n';
 products.forEach(p => {
     js += `    { id: ${p.id}, article: ${JSON.stringify(p.article)}, name: ${JSON.stringify(p.name)}, category: "shoes", sub: "${p.sub}", price: ${p.price}, priceNoVat: ${p.priceNoVat}, pack: ${p.pack} },\n`;
 });
